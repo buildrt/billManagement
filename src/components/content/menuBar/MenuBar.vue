@@ -1,11 +1,14 @@
 <template>
   <div id="menuBar">
     <div id="head">
+      <p id="title">账单管理系统</p>
       <div id="clock">
         <p class="date">{{ date }}&nbsp;{{ time }}</p>
       </div>
     </div>
-    <div id="foot"></div>
+    <div id="foot">
+      <p>本页面由Buildrt版权所有</p>
+    </div>
   </div>
 </template>
 
@@ -57,6 +60,18 @@
     left: 0;
     width: 100%;
     height: 12%;
+    background-image: linear-gradient(to bottom right,#e56ce7, #91b4e5);
+    box-shadow: 0 5px 5px rgba(100,100,100,.5);
+  }
+  #head #title {
+    position: relative;
+    margin-left: 10px;
+    font-size: 24px;
+    color: white;
+    margin-top: 10px;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-shadow: 2px 1px #000;
   }
   #foot {
     position: absolute;
@@ -64,13 +79,20 @@
     left: 0;
     width: 100%;
     height: 8%;
+    text-align: center;
+    background-image: linear-gradient(to bottom right, #91b4e5,#e56ce7);
+  }
+  #foot p {
+    position: relative;
+    font-size: 14px;
+    color: white;
+    top: 30%;
   }
   #clock {
     position: absolute;
     font-family: 'Share Tech Mono', monospace;
-    color: #ffffff;
+    /*color: #ffffff;*/
     text-align: left;
-    position: absolute;
     left: 11%;
     bottom: 0;
     -webkit-transform: translate(-50%, -50%);

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '../store/index'
 
 const Bill = () => import('../views/bill/Bill');
 
@@ -41,10 +42,16 @@ const routes = [
   }
 ];
 
+if (window.localStorage.getItem('isLogin') === 'true') {
+  console.log(Boolean(window.localStorage.getItem('isLogin')));
+  store.commit('setIsLogin',Boolean(window.localStorage.getItem('isLogin')));
+}
+
 const router = new VueRouter({
   routes,
   mode: 'hash'
 });
+
 
 //全局导航守卫
 router.beforeEach((to, from, next) => {

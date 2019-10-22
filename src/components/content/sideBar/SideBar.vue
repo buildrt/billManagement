@@ -1,7 +1,7 @@
 <template>
   <el-menu
     :default-active="this.$router.path"
-    text-color="#000"
+    text-color="#5f7676"
     router
     active-text-color="#ffd04b">
     <el-menu-item index="/bill">
@@ -32,7 +32,9 @@
     name: "SideBar",
     methods: {
       Logout() {
-        this.$store.state.isLogin = false;
+        this.$store.commit('setIsLogin', false);
+        // localStorage里只能存储String
+        window.localStorage.setItem('isLogin', 'false');
         setTimeout(() => {
           this.$router.replace('/login');
         },500);
@@ -47,9 +49,10 @@
     top: 12%;
     width: 13%;
     height: 80%;
-    background-color: rgba(0,0,0,0);
+    /*background-color: rgba(0,0,0,0);*/
     box-shadow: 8px 0 5px rgba(100,100,100,.5);
     text-align: left;
+    background-color: #e6eaed;
   }
   .el-menu-item i {
     margin-right: 15px;

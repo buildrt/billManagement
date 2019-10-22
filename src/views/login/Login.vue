@@ -38,7 +38,9 @@
           //   console.log(res);
           //   if (res === 1) {
           //     alert("登录成功");
-          //     this.$store.state.isLogin = true;
+          //     this.$store.commit('setIsLogin',true);
+          //     // 改变localStorage中isLogin值
+          //     window.localStorage.setItem('isLogin', 'true');
           //     this.$router.push('/bill');
           //   } else {
           //     alert("登录失败");
@@ -47,7 +49,9 @@
           //   console.log(err);
           // })
           alert("登录成功");
-          this.$store.state.isLogin = true;
+          this.$store.commit('setIsLogin',true);
+          // 改变localStorage中isLogin值
+          window.localStorage.setItem('isLogin', 'true');
           this.$router.replace('/bill');
         }
       }

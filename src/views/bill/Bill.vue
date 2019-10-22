@@ -1,15 +1,375 @@
 <template>
   <div id="show">
-    <h2>账单管理页面</h2>
+    <div id="head">
+      <el-form :inline="true" id="billSearch">
+        <el-form-item class="billelfrom" label="商品名称">
+          <el-input id="name"></el-input>
+        </el-form-item>
+        <el-form-item class="billelfrom" label="供应商">
+          <el-select v-model="supplierValue" clearable placeholder="请选择">
+            <el-option
+              v-for="item in BillData"
+              :key="item.supplierName"
+              :label="item.supplierName"
+              :value="item.supplierName">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item class="billelfrom" label="是否付款">
+          <el-select v-model="payValue" clearable placeholder="请选择" style="width: 120px">
+            <el-option
+              v-for="item in payData"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" style="margin-left: 50px">查询</el-button>
+          <el-button type="success" icon="el-icon-edit" style="margin-left: 50px">添加账单</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <el-table
+      id="billInfo"
+      :data="BillData.slice((currpage-1)*pagesize,currpage*pagesize)"
+      height="60%"
+      style="width: 96%"
+      border>
+      <el-table-column
+        fixed
+        prop="billCode"
+        width="130"
+        label="账单编码">
+      </el-table-column>
+      <el-table-column
+        prop="commoditiesName"
+        width="120"
+        fixed
+        label="商品名称">
+      </el-table-column>
+      <el-table-column
+        prop="supplierName"
+        width="150"
+        fixed
+        label="供应商">
+      </el-table-column>
+      <el-table-column
+        prop="price"
+        width="80"
+        label="总金额">
+      </el-table-column>
+      <el-table-column
+        prop="pay"
+        width="80"
+        label="是否付款">
+      </el-table-column>
+      <el-table-column
+        prop="createTime"
+        width="120"
+        label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="description"
+        width="160"
+        label="备注描述">
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="primary"
+            @click="handleCheck(scope.$index, scope.row)">查看</el-button>
+          <el-button
+            size="mini"
+            @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      id="foot"
+      @current-change="handleCurrentChange"
+      :current-page="currpage"
+      :page-sizes="[2, 4, 6, 8]"
+      :page-size="pagesize"
+      layout="total, sizes,prev, pager, next, jumper"
+      :total="BillData.length">
+    </el-pagination>
+    <el-drawer
+      title="查看信息"
+      id="checkInfo"
+      :visible.sync="checkDrawer"
+      direction="rtl"
+      size="30%">
+      <p>账单编码：{{this.checkData.billCode}}</p>
+      <p>商品名称：{{this.checkData.commoditiesName}}</p>
+      <p>供应商：{{this.checkData.supplierName}}</p>
+      <p>总金额：{{this.checkData.price}}</p>
+      <p>是否付款：{{this.checkData.pay}}</p>
+      <p>创建时间：{{this.checkData.createTime}}</p>
+      <p>备注描述：{{this.checkData.description}}</p>
+    </el-drawer>
+    <el-drawer
+      title="修改信息"
+      id="editInfo"
+      :visible.sync="editDrawer"
+      direction="rtl"
+      size="30%">
+      <el-form
+        :model="editData"
+        :rules="editRules"
+        ref="editData"
+        id="editForm"
+        style="width: 96%"
+        label-position="right">
+        <el-form-item label="账单编码" label-width="100px" prop="billCode">
+          <el-input type="text" v-model="editData.billCode"></el-input>
+        </el-form-item>
+        <el-form-item label="商品名称" label-width="100px" prop="commoditiesName" >
+          <el-input type="text" v-model="editData.commoditiesName"></el-input>
+        </el-form-item>
+        <el-form-item label="供应商名称" label-width="100px" prop="supplierName">
+          <el-input type="text" v-model="editData.supplierName"></el-input>
+        </el-form-item>
+        <el-form-item label="总金额" label-width="100px" prop="price">
+          <el-input type="text" v-model="editData.price"></el-input>
+        </el-form-item>
+        <el-form-item label="创建时间" label-width="100px" prop="createTime">
+          <el-date-picker
+            v-model="editData.createTime"
+            type="date"
+            placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="备注描述" label-width="100px" prop="description">
+          <el-input type="text" v-model="editData.description"></el-input>
+        </el-form-item>
+        <el-form-item label="是否付款" label-width="100px" prop="pay">
+          <el-select v-model="editData.pay" clearable placeholder="请选择">
+            <el-option
+              v-for="item in payData"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label-width="100px">
+          <el-button type="primary" id="search" @click="save('editData')">保存</el-button>
+          <el-button id="reset" @click="cancel('editData')">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-drawer>
   </div>
 </template>
 
 <script>
+  import axios from "../../network/axios";
+
   export default {
-    name: "Bill"
+    name: "Bill",
+    mounted() {
+      this.getFullData();
+    },
+    data() {
+      return {
+        BillData: [],
+        payData: [
+          {value: 0, label: '未付款'},
+          {value: 1, label: '已付款'}
+        ],
+        supplierValue: '',
+        payValue: '',
+        pagesize: 8,  // 每页的数据数
+        currpage: 1,  // 默认开始页面
+        checkDrawer: false,
+        editDrawer: false,
+        checkData: {
+          billCode: '',
+          commoditiesName: '',
+          supplierName: '',
+          price: '',
+          pay: '',
+          createTime: '',
+          description: ''
+        },
+        editData: {
+          billCode: '',
+          commoditiesName: '',
+          supplierName: '',
+          price: '',
+          pay: '',
+          createTime: '',
+          description: ''
+        },
+        editRules: {
+          billCode: [
+            { required: true, message: '请输入账单编码', trigger: 'blur' },
+          ],
+          commoditiesName: [
+            { required: true, message: '请输入商品名称', trigger: 'blur' },
+          ],
+          supplierName: [
+            { required: true, message: '请输入供应商', trigger: 'blur' },
+          ],
+          price: [
+            { required: true, message: '请输入总金额', trigger: 'blur' },
+          ],
+          pay: [
+            { required: true, message: '请输入是否付款', trigger: 'blur' },
+          ],
+          createTime: [
+            { required: true, message: '请输入创建时间', trigger: 'blur' },
+          ],
+          description: [
+            { required: true, message: '请输入备注描述', trigger: 'blur' },
+          ]
+        }
+      }
+    },
+    methods: {
+      getFullData() {
+        axios({
+          url: '/billInfo'
+        }).then(res => {
+          console.log(res);
+          console.log(res.length);
+          let BillData = res.data;
+          let data = [];
+          let len = BillData.length;
+          for (let i=0; i< len; i++){
+            let obj = {};
+            obj.billCode = BillData[i].billCode;
+            obj.commoditiesName = BillData[i].commoditiesName;
+            obj.supplierName = BillData[i].supplierName;
+            obj.price = BillData[i].price;
+            if (BillData[i].pay === 1) {
+              obj.pay = '已付款'
+            }else {
+              obj.pay = '未付款'
+            }
+            obj.createTime = BillData[i].createTime;
+            obj.description = BillData[i].description;
+            data[i] = obj;
+          }
+          this.BillData = data;
+        }).catch(err => {
+          console.log(err);
+        })
+      },
+      handleEdit(index, row) {
+        console.log(index, row);
+        this.editDrawer = true;
+      },
+      handleCheck(index, row) {
+        console.log(index, row);
+        this.checkDrawer = true;
+        this.checkData.billCode = row.billCode;
+        this.checkData.commoditiesName = row.commoditiesName;
+        this.checkData.supplierName = row.supplierName;
+        this.checkData.price = row.price;
+        this.checkData.pay = row.pay;
+        this.checkData.createTime = row.createTime;
+        this.checkData.description = row.description;
+
+      },
+      handleDelete(index, row) {
+        console.log(index, row);
+      },
+      handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+        this.pagesize=val;
+      },
+      handleCurrentChange(val) {
+        console.log(`当前页: ${val}`);
+        this.currpage=val;
+      },
+      save(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            alert('修改成功');
+          } else {
+            console.log('修改失败');
+            return false;
+          }
+        });
+      },
+      cancel(formName) {
+        this.$refs[formName].resetFields();
+        this.editDrawer = false;
+      }
+    }
   }
 </script>
 
+<style>
+  .billelfrom .el-form-item__label {
+    color: white;
+  }
+</style>
+
 <style scoped>
   @import "../../assets/css/show/show.css";
+  #billInfo {
+    position: absolute;
+    top: 20%;
+    left: 2%;
+    font-size: 14px;
+  }
+  #foot {
+    position: absolute;
+    top: 85%;
+    right: 10%;
+  }
+  #head {
+    position: absolute;
+    width: 100%;
+    height: 18%;
+    background-color: #ff8198;
+  }
+  #billSearch {
+    position: relative;
+    top: 30%;
+    margin-left: 3%;
+  }
+  .el-input {
+    width: 130px;
+  }
+  #checkInfo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 22px;
+    font-weight: bolder;
+  }
+  #checkInfo p {
+    position: relative;
+    top: 6%;
+    margin-bottom: 40px;
+    left: 10%;
+    font-size: 18px;
+  }
+  #editInfo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 22px;
+    font-weight: bolder;
+  }
+  #editInfo #editForm {
+    position: relative;
+    width: 100%;
+    height: 80%;
+    margin-left: 10%;
+    margin-top: 10%;
+  }
+  #editInfo #editForm .el-input {
+    width: 200px;
+  }
 </style>
