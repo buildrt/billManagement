@@ -12,11 +12,11 @@
       <i class="el-icon-truck"></i>
       <span slot="title">供应商管理</span>
     </el-menu-item>
-    <el-menu-item index="2">
+    <el-menu-item index="/profile">
       <i class="el-icon-user"></i>
       <span slot="title">用户管理</span>
     </el-menu-item>
-    <el-menu-item index="3">
+    <el-menu-item index="/passEdit">
       <i class="el-icon-unlock"></i>
       <span slot="title">密码修改</span>
     </el-menu-item>

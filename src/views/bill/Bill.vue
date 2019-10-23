@@ -1,12 +1,17 @@
 <template>
   <div id="show">
     <div id="head">
-      <el-form :inline="true" id="billSearch">
-        <el-form-item class="billelfrom" label="商品名称">
-          <el-input id="name"></el-input>
+      <el-form
+        :inline="true"
+        :model="searchBillData"
+        :rules="searchBillRules"
+        ref="searchBillData"
+        id="billSearch">
+        <el-form-item class="billelfrom" label="商品名称" prop="billCode">
+          <el-input id="name" type="text" v-model="searchBillData.billCode"></el-input>
         </el-form-item>
-        <el-form-item class="billelfrom" label="供应商">
-          <el-select v-model="supplierValue" clearable placeholder="请选择">
+        <el-form-item class="billelfrom" label="供应商" prop="supplierName">
+          <el-select v-model="searchBillData.supplierName" clearable placeholder="请选择">
             <el-option
               v-for="item in BillData"
               :key="item.supplierName"
@@ -15,8 +20,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item class="billelfrom" label="是否付款">
-          <el-select v-model="payValue" clearable placeholder="请选择" style="width: 120px">
+        <el-form-item class="billelfrom" label="是否付款" prop="pay">
+          <el-select v-model="searchBillData.pay" clearable placeholder="请选择" style="width: 120px">
             <el-option
               v-for="item in payData"
               :key="item.value"
@@ -26,32 +31,32 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-search" style="margin-left: 50px">查询</el-button>
-          <el-button type="success" icon="el-icon-edit" style="margin-left: 50px">添加账单</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="SearchBill('searchBillData')" style="margin-left: 50px">查询</el-button>
+          <el-button type="success" :disabled="!$store.state.isAdmin" icon="el-icon-edit" @click="addDrawer = true" style="margin-left: 50px">添加账单</el-button>
         </el-form-item>
       </el-form>
     </div>
     <el-table
       id="billInfo"
       :data="BillData.slice((currpage-1)*pagesize,currpage*pagesize)"
-      height="60%"
+      height="64%"
       style="width: 96%"
       border>
       <el-table-column
         fixed
         prop="billCode"
-        width="130"
+        width="140"
         label="账单编码">
       </el-table-column>
       <el-table-column
         prop="commoditiesName"
-        width="120"
+        width="160"
         fixed
         label="商品名称">
       </el-table-column>
       <el-table-column
         prop="supplierName"
-        width="150"
+        width="200"
         fixed
         label="供应商">
       </el-table-column>
@@ -62,32 +67,29 @@
       </el-table-column>
       <el-table-column
         prop="pay"
-        width="80"
+        width="100"
         label="是否付款">
       </el-table-column>
       <el-table-column
         prop="createTime"
-        width="120"
-        label="创建时间">
-      </el-table-column>
-      <el-table-column
-        prop="description"
         width="160"
-        label="备注描述">
+        label="创建时间">
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="primary"
-            @click="handleCheck(scope.$index, scope.row)">查看</el-button>
+            @click="BillCheck(scope.$index, scope.row)">查看</el-button>
           <el-button
             size="mini"
-            @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+            :disabled="!$store.state.isAdmin"
+            @click="BillEdit(scope.$index, scope.row)">修改</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            :disabled="!$store.state.isAdmin"
+            @click="BillDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -161,8 +163,59 @@
           </el-select>
         </el-form-item>
         <el-form-item label-width="100px">
-          <el-button type="primary" id="search" @click="save('editData')">保存</el-button>
-          <el-button id="reset" @click="cancel('editData')">取消</el-button>
+          <el-button type="primary" id="search" @click="BillEditSave('editData')">保存</el-button>
+          <el-button id="reset" @click="BillCancel('editData')">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-drawer>
+    <el-drawer
+      title="添加信息"
+      id="addInfo"
+      :visible.sync="addDrawer"
+      direction="rtl"
+      size="30%">
+      <el-form
+        :model="addData"
+        :rules="addRules"
+        ref="addData"
+        id="addForm"
+        style="width: 96%"
+        label-position="right">
+        <el-form-item label="账单编码" label-width="100px" prop="billCode">
+          <el-input type="text" v-model="addData.billCode"></el-input>
+        </el-form-item>
+        <el-form-item label="商品名称" label-width="100px" prop="commoditiesName" >
+          <el-input type="text" v-model="addData.commoditiesName"></el-input>
+        </el-form-item>
+        <el-form-item label="供应商名称" label-width="100px" prop="supplierName">
+          <el-input type="text" v-model="addData.supplierName"></el-input>
+        </el-form-item>
+        <el-form-item label="总金额" label-width="100px" prop="price">
+          <el-input type="text" v-model="addData.price"></el-input>
+        </el-form-item>
+        <el-form-item label="创建时间" label-width="100px" prop="createTime">
+          <el-date-picker
+            v-model="addData.createTime"
+            type="date"
+            placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="备注描述" label-width="100px" prop="description">
+          <el-input type="text" v-model="addData.description"></el-input>
+        </el-form-item>
+        <el-form-item label="是否付款" label-width="100px" prop="pay">
+          <el-select v-model="addData.pay" clearable placeholder="请选择">
+            <el-option
+              v-for="item in payData"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label-width="100px">
+          <el-button type="primary" @click="InsertBill('addData')">添加</el-button>
+          <el-button @click="BillCancel('addData')">取消</el-button>
         </el-form-item>
       </el-form>
     </el-drawer>
@@ -171,6 +224,10 @@
 
 <script>
   import axios from "../../network/axios";
+  import {billEdit} from "../../network/bill/edit";
+  import {billSearch} from "../../network/bill/search";
+  import {deleteBill} from "../../network/bill/delete";
+  import {billInsert} from "../../network/bill/insert";
 
   export default {
     name: "Bill",
@@ -190,6 +247,7 @@
         currpage: 1,  // 默认开始页面
         checkDrawer: false,
         editDrawer: false,
+        addDrawer: false,
         checkData: {
           billCode: '',
           commoditiesName: '',
@@ -209,6 +267,54 @@
           description: ''
         },
         editRules: {
+          billCode: [
+            { required: true, message: '请输入账单编码', trigger: 'blur' },
+          ],
+          commoditiesName: [
+            { required: true, message: '请输入商品名称', trigger: 'blur' },
+          ],
+          supplierName: [
+            { required: true, message: '请输入供应商', trigger: 'blur' },
+          ],
+          price: [
+            { required: true, message: '请输入总金额', trigger: 'blur' },
+          ],
+          pay: [
+            { required: true, message: '请输入是否付款', trigger: 'blur' },
+          ],
+          createTime: [
+            { required: true, message: '请输入创建时间', trigger: 'blur' },
+          ],
+          description: [
+            { required: true, message: '请输入备注描述', trigger: 'blur' },
+          ]
+        },
+        searchBillData: {
+          billCode: '',
+          supplierName: '',
+          pay: '',
+        },
+        searchBillRules: {
+          billCode: [
+            { required: true, message: '请输入账单编码', trigger: 'blur' },
+          ],
+          supplierName: [
+            { required: true, message: '请输入供应商', trigger: 'blur' },
+          ],
+          pay: [
+            { required: true, message: '请输入是否付款', trigger: 'blur' },
+          ],
+        },
+        addData: {
+          billCode: '',
+          commoditiesName: '',
+          supplierName: '',
+          price: '',
+          pay: '',
+          createTime: '',
+          description: ''
+        },
+        addRules: {
           billCode: [
             { required: true, message: '请输入账单编码', trigger: 'blur' },
           ],
@@ -263,11 +369,11 @@
           console.log(err);
         })
       },
-      handleEdit(index, row) {
+      BillEdit(index, row) {
         console.log(index, row);
         this.editDrawer = true;
       },
-      handleCheck(index, row) {
+      BillCheck(index, row) {
         console.log(index, row);
         this.checkDrawer = true;
         this.checkData.billCode = row.billCode;
@@ -279,8 +385,34 @@
         this.checkData.description = row.description;
 
       },
-      handleDelete(index, row) {
+      BillDelete(index, row) {
         console.log(index, row);
+        deleteBill(row.billCode).then(res => {
+          console.log(res);
+          if (res === 1) {
+            alert('删除成功');
+            this.$router.go(0);
+          } else {
+            alert("删除失败");
+          }
+        }).catch(err => {
+          console.log(err);
+        });
+        this.BillData.splice(index,1);
+      },
+      SearchBill(formName) {
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            console.log(this.searchBillData.billCode, this.searchBillData.supplierName, this.searchBillData.pay);
+            // billSearch(this.searchBillData.billCode, this.searchBillData.supplierName, this.searchBillData.pay).then(res => {
+            //   console.log(res);
+            //   alert('查询成功');
+            // }).catch(err => {
+            //   console.log(err);
+            // });
+            alert('查询成功');
+          }
+        })
       },
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`);
@@ -290,19 +422,55 @@
         console.log(`当前页: ${val}`);
         this.currpage=val;
       },
-      save(formName) {
+      BillEditSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            alert('修改成功');
-          } else {
-            console.log('修改失败');
-            return false;
+            console.log(this.editData.billCode,this.editData.commoditiesName,this.editData.supplierName,this.editData.price,this.editData.pay,this.editData.createTime, this.editData.description);
+            let createTime = this.editData.createTime.getFullYear() + '-' + (this.editData.createTime.getMonth()+1 < 10 ? '0'+(this.editData.createTime.getMonth()+1) : this.editData.createTime.getMonth()+1) + '-' +  (this.editData.createTime.getDate()<10?'0'+(this.editData.createTime.getDate()):this.editData.createTime.getDate());
+            console.log(createTime);
+            billEdit(this.editData.billCode,this.editData.commoditiesName,this.editData.supplierName,this.editData.price,this.editData.pay,createTime, this.editData.description).then(res => {
+              console.log(res);
+              if (res === 1) {
+                alert('修改成功');
+                this.editDrawer = false;
+                this.$router.go(0);
+              } else {
+                alert('修改失败');
+              }
+            }).catch(err => {
+              console.log(err);
+            });
+            // alert('修改成功');
+            // this.editDrawer = false;
+            // this.$router.go(0);
           }
         });
       },
-      cancel(formName) {
+      BillCancel(formName) {
         this.$refs[formName].resetFields();
         this.editDrawer = false;
+        this.addDrawer = false;
+      },
+      InsertBill(formName) {
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            console.log(this.addData.billCode,this.addData.commoditiesName,this.addData.supplierName,this.addData.price,this.addData.pay,this.addData.createTime, this.addData.description);
+            let createTime = this.editData.createTime.getFullYear() + '-' + (this.editData.createTime.getMonth()+1 < 10 ? '0'+(this.editData.createTime.getMonth()+1) : this.editData.createTime.getMonth()+1) + '-' +  (this.editData.createTime.getDate()<10?'0'+(this.editData.createTime.getDate()):this.editData.createTime.getDate());
+            console.log(createTime);
+            billInsert(this.addData.billCode,this.addData.commoditiesName,this.addData.supplierName,this.addData.price,this.addData.pay,createTime, this.addData.description).then(res => {
+              console.log(res);
+              if (res === 1) {
+                alert('添加成功');
+                this.addDrawer = false;
+                this.$router.go(0);
+              }else {
+                alert('添加失败');
+              }
+            }).catch(err => {
+              console.log(err);
+            })
+          }
+        })
       }
     }
   }
@@ -324,7 +492,7 @@
   }
   #foot {
     position: absolute;
-    top: 85%;
+    top: 90%;
     right: 10%;
   }
   #head {
@@ -355,21 +523,21 @@
     left: 10%;
     font-size: 18px;
   }
-  #editInfo {
+  #editInfo,#addInfo {
     position: absolute;
     top: 0;
     left: 0;
     font-size: 22px;
     font-weight: bolder;
   }
-  #editInfo #editForm {
+  #editInfo #editForm, #addInfo #addForm {
     position: relative;
     width: 100%;
     height: 80%;
     margin-left: 10%;
     margin-top: 10%;
   }
-  #editInfo #editForm .el-input {
+  #editInfo #editForm .el-input, #addInfo #addForm .el-input{
     width: 200px;
   }
 </style>

@@ -3,8 +3,9 @@ import VueRouter from 'vue-router'
 import store from '../store/index'
 
 const Bill = () => import('../views/bill/Bill');
-
 const Retailer = () => import('../views/retailer/Retailer');
+const Profile = () => import('../views/profile/Profile');
+const PassEdit = () => import('../views/passEdit/PassEdit');
 
 const Login = () => import('../views/login/Login');
 
@@ -34,6 +35,20 @@ const routes = [
     }
   },
   {
+    path: '/profile',
+    component: Profile,
+    meta: {
+      title: '用户管理'
+    }
+  },
+  {
+    path: '/passEdit',
+    component: PassEdit,
+    meta: {
+      title: '密码修改'
+    }
+  },
+  {
     path: '/login',
     component: Login,
     meta: {
@@ -42,9 +57,14 @@ const routes = [
   }
 ];
 
+// 监听浏览器刷新
 if (window.localStorage.getItem('isLogin') === 'true') {
   console.log(Boolean(window.localStorage.getItem('isLogin')));
   store.commit('setIsLogin',Boolean(window.localStorage.getItem('isLogin')));
+}
+if (window.localStorage.getItem('isAdmin') === 'true') {
+  console.log(Boolean(window.localStorage.getItem('isAdmin')));
+  store.commit('setIsAdmin',Boolean(window.localStorage.getItem('isAdmin')));
 }
 
 const router = new VueRouter({

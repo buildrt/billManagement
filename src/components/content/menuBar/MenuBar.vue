@@ -94,7 +94,7 @@
     /*color: #ffffff;*/
     text-align: left;
     left: 11%;
-    bottom: 0;
+    top: 80%;
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     color: #daf6ff;

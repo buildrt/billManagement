@@ -41,7 +41,12 @@
           //     this.$store.commit('setIsLogin',true);
           //     // 改变localStorage中isLogin值
           //     window.localStorage.setItem('isLogin', 'true');
-          //     this.$router.push('/bill');
+          //     if (res.rroleId === 1){
+          //       this.$store.commit('setIsAdmin',true);
+          //     } else {
+          //       this.$store.commit('setIsAdmin',false);
+          //     }
+          //     this.$router.replace('/bill');
           //   } else {
           //     alert("登录失败");
           //   }
@@ -52,6 +57,8 @@
           this.$store.commit('setIsLogin',true);
           // 改变localStorage中isLogin值
           window.localStorage.setItem('isLogin', 'true');
+          this.$store.commit('setIsAdmin', true);
+          window.localStorage.setItem('isAdmin', 'true');
           this.$router.replace('/bill');
         }
       }
