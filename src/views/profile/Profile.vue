@@ -18,7 +18,62 @@
     </div>
     <el-table
       id="userInfo"
+      v-if="!this.$store.state.profileSelect"
       :data="UserData.slice((currpage-1)*pagesize,currpage*pagesize)"
+      height="64%"
+      style="width: 96%"
+      border>
+      <el-table-column
+        fixed
+        prop="clientId"
+        width="160"
+        label="用户ID">
+      </el-table-column>
+      <el-table-column
+        prop="clientName"
+        width="160"
+        fixed
+        label="用户名">
+      </el-table-column>
+      <el-table-column
+        prop="name"
+        width="140"
+        fixed
+        label="真实姓名">
+      </el-table-column>
+      <el-table-column
+        prop="crId"
+        width="140"
+        fixed
+        label="用户角色">
+      </el-table-column>
+      <el-table-column
+        prop="phoneNumber"
+        width="200"
+        label="电话">
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="primary"
+            @click="UserCheck(scope.$index, scope.row)">查看</el-button>
+          <el-button
+            size="mini"
+            :disabled="!$store.state.isAdmin"
+            @click="UserEdit(scope.$index, scope.row)">修改</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            :disabled="!$store.state.isAdmin"
+            @click="UserDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-table
+      id="userSelectInfo"
+      v-else
+      :data="UserSelectData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
       border>
@@ -178,11 +233,13 @@
   export default {
     name: "Profile",
     mounted() {
+      this.$store.commit('setProfileSelect',false);
       this.getFullUserData();
     },
     data() {
       return {
         UserData: [],
+        UserSelectData: [],
         pagesize: 8,  // 每页的数据数
         currpage: 1,  // 默认开始页面
         checkDrawer: false,
@@ -320,7 +377,22 @@
             console.log(this.searchUserData.clientName);
             profileSearch(this.searchUserData.clientName).then(res => {
               console.log(res);
+              this.$store.commit('setProfileSelect',true);
               alert('查询成功');
+              let UserSelectData = res.data;
+              let data = [];
+              let len = UserSelectData.length;
+              for (let i=0; i< len; i++){
+                let obj = {};
+                obj.clientId = UserSelectData[i].clientId;
+                obj.clientName = UserSelectData[i].clientName;
+                obj.passWord = UserSelectData[i].passWord;
+                obj.phoneNumber = UserSelectData[i].phoneNumber;
+                obj.name = UserSelectData[i].name;
+                obj.crId = UserSelectData[i].crId;
+                data[i] = obj;
+              }
+              this.UserSelectData = data;
             }).catch(err => {
               console.log(err);
             });
@@ -393,6 +465,12 @@
 <style scoped>
   @import "../../assets/css/show/show.css";
   #userInfo {
+    position: absolute;
+    top: 20%;
+    left: 2%;
+    font-size: 14px;
+  }
+  #userSelectInfo {
     position: absolute;
     top: 20%;
     left: 2%;

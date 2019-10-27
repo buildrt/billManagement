@@ -10,6 +10,7 @@
         <i class="fa fa-lock" aria-hidden="true"></i>
         <input type="password" id="pwd" placeholder="Password" name="">
       </div>
+      <el-checkbox v-model="rememberIsClick" @click="IsRemember">Remember Me</el-checkbox >
       <input class="btn" type="button" @click="LoginSub" name="" value="Sign in">
     </div>
   </div>
@@ -22,19 +23,19 @@
     name: "Login",
     data() {
       return {
-
+        rememberIsClick: false
       }
     },
     methods: {
       LoginSub() {
         let username = document.getElementById('uname').value;
         let password = document.getElementById('pwd').value;
-        console.log(username, password);
+        console.log(username, password, this.rememberIsClick);
         if (username === '' || password === '') {
           alert("请输入用户名及密码");
         } else {
-          console.log(username, password);
-          // login(username,password).then(res => {
+          // console.log(username, password, this.rememberIsClick);
+          // login(username,password,this.rememberIsClick).then(res => {
           //   console.log(res);
           //   if (res === 1) {
           //     alert("登录成功");
@@ -61,11 +62,23 @@
           window.localStorage.setItem('isAdmin', 'true');
           this.$router.replace('/bill');
         }
-      }
+      },
+      IsRemember() {
+        this.rememberIsClick = true;
+      },
     }
   }
 </script>
 
+<style>
+  span.el-checkbox__input.is-checked+.el-checkbox__label {
+    color: #4caf50;
+  }
+  span.el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+    background-color: #4caf50;
+    border-color: #4caf50;
+  }
+</style>
 <style scoped>
   @import "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
   #login-show {

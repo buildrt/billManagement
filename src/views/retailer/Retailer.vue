@@ -18,7 +18,61 @@
     </div>
     <el-table
       id="retailerInfo"
+      v-if="!this.$store.state.retailerSelect"
       :data="RetailerData.slice((currpage-1)*pagesize,currpage*pagesize)"
+      height="64%"
+      style="width: 96%"
+      border>
+      <el-table-column
+        fixed
+        prop="supplierId"
+        width="140"
+        label="供应商编码">
+      </el-table-column>
+      <el-table-column
+        prop="supplierName"
+        width="220"
+        fixed
+        label="供应商名称">
+      </el-table-column>
+      <el-table-column
+        prop="contactPerson"
+        width="140"
+        fixed
+        label="联系人">
+      </el-table-column>
+      <el-table-column
+        prop="phoneNumber"
+        width="160"
+        label="联系人电话">
+      </el-table-column>
+      <el-table-column
+        prop="createTime"
+        width="160"
+        label="创建时间">
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="primary"
+            @click="RetailerCheck(scope.$index, scope.row)">查看</el-button>
+          <el-button
+            size="mini"
+            :disabled="!$store.state.isAdmin"
+            @click="RetailerEdit(scope.$index, scope.row)">修改</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            :disabled="!$store.state.isAdmin"
+            @click="RetailerDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-table
+      id="retailerSelectInfo"
+      v-else
+      :data="RetailerSelectData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
       border>
@@ -186,11 +240,14 @@
   export default {
     name: "Retailer",
     mounted() {
+      this.$store.commit('setRetailerSelect',false);
       this.getFullRetailerData();
     },
     data() {
       return {
         RetailerData: [],
+        RetailerSelectData: [],
+        RetailerSelect: [],
         pagesize: 8,  // 每页的数据数
         currpage: 1,  // 默认开始页面
         checkDrawer: false,
@@ -328,13 +385,29 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             console.log(this.searchRetailerData.supplierName);
-            // retailerSearch(this.searchRetailerData.supplierName).then(res => {
-            //   console.log(res);
-            //   alert('查询成功');
-            // }).catch(err => {
-            //   console.log(err);
-            // });
-            alert('查询成功');
+            retailerSearch(this.searchRetailerData.supplierName).then(res => {
+              console.log(res);
+              this.$store.commit('setRetailerSelect',true);
+              alert('查询成功');
+              let RetailerSelectData = res.data;
+              let data = [];
+              let len = RetailerSelectData.length;
+              for (let i=0; i< len; i++){
+                let obj = {};
+                obj.supplierId = RetailerSelectData[i].supplierId;
+                obj.supplierName = RetailerSelectData[i].supplierName;
+                obj.contactPerson = RetailerSelectData[i].contactPerson;
+                obj.phoneNumber = RetailerSelectData[i].phoneNumber;
+                obj.createTime = RetailerSelectData[i].createTime;
+                obj.description = RetailerSelectData[i].description;
+                data[i] = obj;
+              }
+              this.RetailerSelectData = data;
+            }).catch(err => {
+              alert('查询失败');
+              console.log(err);
+            });
+            // alert('查询成功');
           }
         })
       },
@@ -409,6 +482,12 @@
 <style scoped>
   @import "../../assets/css/show/show.css";
   #retailerInfo {
+    position: absolute;
+    top: 20%;
+    left: 2%;
+    font-size: 14px;
+  }
+  #retailerSelectInfo {
     position: absolute;
     top: 20%;
     left: 2%;

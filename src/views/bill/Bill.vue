@@ -38,7 +38,66 @@
     </div>
     <el-table
       id="billInfo"
+      v-if="!this.$store.state.billSelect"
       :data="BillData.slice((currpage-1)*pagesize,currpage*pagesize)"
+      height="64%"
+      style="width: 96%"
+      border>
+      <el-table-column
+        fixed
+        prop="billCode"
+        width="140"
+        label="账单编码">
+      </el-table-column>
+      <el-table-column
+        prop="commoditiesName"
+        width="160"
+        fixed
+        label="商品名称">
+      </el-table-column>
+      <el-table-column
+        prop="supplierName"
+        width="200"
+        fixed
+        label="供应商">
+      </el-table-column>
+      <el-table-column
+        prop="price"
+        width="80"
+        label="总金额">
+      </el-table-column>
+      <el-table-column
+        prop="pay"
+        width="100"
+        label="是否付款">
+      </el-table-column>
+      <el-table-column
+        prop="createTime"
+        width="160"
+        label="创建时间">
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="primary"
+            @click="BillCheck(scope.$index, scope.row)">查看</el-button>
+          <el-button
+            size="mini"
+            :disabled="!$store.state.isAdmin"
+            @click="BillEdit(scope.$index, scope.row)">修改</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            :disabled="!$store.state.isAdmin"
+            @click="BillDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-table
+      id="billSelectInfo"
+      v-else
+      :data="BillSelectData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
       border>
@@ -232,11 +291,13 @@
   export default {
     name: "Bill",
     mounted() {
+      this.$store.commit('setBillSelect',false);
       this.getFullData();
     },
     data() {
       return {
         BillData: [],
+        BillSelectData: [],
         payData: [
           {value: 0, label: '未付款'},
           {value: 1, label: '已付款'}
@@ -345,10 +406,10 @@
           url: '/billInfo'
         }).then(res => {
           console.log(res);
-          console.log(res.length);
           let BillData = res.data;
           let data = [];
           let len = BillData.length;
+          console.log(len);
           for (let i=0; i< len; i++){
             let obj = {};
             obj.billCode = BillData[i].billCode;
@@ -404,13 +465,35 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             console.log(this.searchBillData.billCode, this.searchBillData.supplierName, this.searchBillData.pay);
-            // billSearch(this.searchBillData.billCode, this.searchBillData.supplierName, this.searchBillData.pay).then(res => {
-            //   console.log(res);
-            //   alert('查询成功');
-            // }).catch(err => {
-            //   console.log(err);
-            // });
-            alert('查询成功');
+            billSearch(this.searchBillData.billCode, this.searchBillData.supplierName, this.searchBillData.pay).then(res => {
+              console.log(res);
+              alert('查询成功');
+              this.$store.commit('setBillSelect',true);
+              let BillSelectData = res.data;
+              let data = [];
+              let len = BillSelectData.length;
+              console.log(len);
+              for (let i=0; i< len; i++){
+                let obj = {};
+                obj.billCode = BillSelectData[i].billCode;
+                obj.commoditiesName = BillSelectData[i].commoditiesName;
+                obj.supplierName = BillSelectData[i].supplierName;
+                obj.price = BillSelectData[i].price;
+                if (BillSelectData[i].pay === 1) {
+                  obj.pay = '已付款'
+                }else {
+                  obj.pay = '未付款'
+                }
+                obj.createTime = BillSelectData[i].createTime;
+                obj.description = BillSelectData[i].description;
+                data[i] = obj;
+              }
+              this.BillSelectData = data;
+            }).catch(err => {
+              alert('查询失败');
+              console.log(err);
+            });
+            // alert('查询成功');
           }
         })
       },
@@ -485,6 +568,12 @@
 <style scoped>
   @import "../../assets/css/show/show.css";
   #billInfo {
+    position: absolute;
+    top: 20%;
+    left: 2%;
+    font-size: 14px;
+  }
+  #billSelectInfo {
     position: absolute;
     top: 20%;
     left: 2%;

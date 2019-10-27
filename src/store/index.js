@@ -10,6 +10,9 @@ import getters from './getters'
 const state = {
   isLogin: false,
   isAdmin: false,
+  billSelect: false,
+  retailerSelect: false,
+  profileSelect: false,
 };
 
 const store = new Vuex.Store({
