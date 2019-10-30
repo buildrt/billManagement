@@ -13,5 +13,11 @@ export default {
   },
   setProfileSelect(state, profileSelect) {
     state.profileSelect = profileSelect;
+  },
+  setLoginUserName(state, loginUserName) {
+    state.loginUserName = loginUserName;
+  },
+  setLoginPassWord(state, loginPassWord) {
+    state.loginPassWord = loginPassWord;
   }
 }

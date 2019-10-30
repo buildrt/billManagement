@@ -18,7 +18,7 @@
     </div>
     <el-table
       id="retailerInfo"
-      v-if="!this.$store.state.retailerSelect"
+      v-if="!this.retailerIsShow"
       :data="RetailerData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
@@ -71,7 +71,7 @@
     </el-table>
     <el-table
       id="retailerSelectInfo"
-      v-else
+      v-if="this.retailerIsShow"
       :data="RetailerSelectData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
@@ -125,12 +125,24 @@
     <el-pagination
       @size-change="handleSizeChange"
       id="foot"
+      v-if="!this.retailerIsShow"
       @current-change="handleCurrentChange"
       :current-page="currpage"
       :page-sizes="[2, 4, 6, 8]"
       :page-size="pagesize"
       layout="total, sizes,prev, pager, next, jumper"
       :total="RetailerData.length">
+    </el-pagination>
+    <el-pagination
+      @size-change="handleSizeChange"
+      id="foot2"
+      v-if="this.retailerIsShow"
+      @current-change="handleCurrentChange"
+      :current-page="currpage"
+      :page-sizes="[2, 4, 6, 8]"
+      :page-size="pagesize"
+      layout="total, sizes,prev, pager, next, jumper"
+      :total="RetailerSelectData.length">
     </el-pagination>
     <el-drawer
       title="查看信息"
@@ -199,9 +211,6 @@
         id="addForm"
         style="width: 96%"
         label-position="right">
-        <el-form-item label="供应商编码" label-width="100px" prop="supplierId">
-          <el-input type="text" v-model="addData.supplierId"></el-input>
-        </el-form-item>
         <el-form-item label="供应商名称" label-width="100px" prop="supplierName">
           <el-input type="text" v-model="addData.supplierName"></el-input>
         </el-form-item>
@@ -240,13 +249,15 @@
   export default {
     name: "Retailer",
     mounted() {
-      this.$store.commit('setRetailerSelect',false);
+      // this.$store.commit('setRetailerSelect',false);
+      this.retailerIsShow = false;
       this.getFullRetailerData();
     },
     data() {
       return {
         RetailerData: [],
         RetailerSelectData: [],
+        retailerIsShow: true,
         RetailerSelect: [],
         pagesize: 8,  // 每页的数据数
         currpage: 1,  // 默认开始页面
@@ -298,7 +309,6 @@
           ]
         },
         addData: {
-          supplierId: '',
           supplierName: '',
           contactPerson: '',
           phoneNumber: '',
@@ -306,9 +316,6 @@
           description: ''
         },
         addRules: {
-          supplierId: [
-            { required: true, message: '请输入账单编码', trigger: 'blur' },
-          ],
           supplierName: [
             { required: true, message: '请输入供应商', trigger: 'blur' },
           ],
@@ -330,20 +337,20 @@
     methods: {
       getFullRetailerData() {
         axios({
-          url: '/retailerInfo'
+          url: '/Supplier/selectAll'
         }).then(res => {
           console.log(res);
           console.log(res.length);
-          let RetailerData = res.data;
+          let RetailerData = res;
           let data = [];
           let len = RetailerData.length;
           for (let i=0; i< len; i++){
             let obj = {};
-            obj.supplierId = RetailerData[i].supplierId;
-            obj.supplierName = RetailerData[i].supplierName;
-            obj.contactPerson = RetailerData[i].contactPerson;
-            obj.phoneNumber = RetailerData[i].phoneNumber;
-            obj.createTime = RetailerData[i].createTime;
+            obj.supplierId = RetailerData[i].supplierid;
+            obj.supplierName = RetailerData[i].suppliername;
+            obj.contactPerson = RetailerData[i].contactperson;
+            obj.phoneNumber = RetailerData[i].phonenumber;
+            obj.createTime = RetailerData[i].createtime;
             obj.description = RetailerData[i].description;
             data[i] = obj;
           }
@@ -387,22 +394,20 @@
             console.log(this.searchRetailerData.supplierName);
             retailerSearch(this.searchRetailerData.supplierName).then(res => {
               console.log(res);
-              this.$store.commit('setRetailerSelect',true);
-              alert('查询成功');
-              let RetailerSelectData = res.data;
-              let data = [];
-              let len = RetailerSelectData.length;
-              for (let i=0; i< len; i++){
-                let obj = {};
-                obj.supplierId = RetailerSelectData[i].supplierId;
-                obj.supplierName = RetailerSelectData[i].supplierName;
-                obj.contactPerson = RetailerSelectData[i].contactPerson;
-                obj.phoneNumber = RetailerSelectData[i].phoneNumber;
-                obj.createTime = RetailerSelectData[i].createTime;
-                obj.description = RetailerSelectData[i].description;
-                data[i] = obj;
-              }
-              this.RetailerSelectData = data;
+              // this.$store.commit('setRetailerSelect',true);
+              // alert('查询成功');
+              this.retailerIsShow = true;
+              let RetailerSelectData = res;
+              let obj = {};
+              this.RetailerSelectData = [];
+              obj.supplierId = RetailerSelectData.supplierid;
+              obj.supplierName = RetailerSelectData.suppliername;
+              obj.contactPerson = RetailerSelectData.contactperson;
+              obj.phoneNumber = RetailerSelectData.phonenumber;
+              obj.createTime = RetailerSelectData.createtime;
+              obj.description = RetailerSelectData.description;
+              this.RetailerSelectData[0] = obj;
+              console.log(this.RetailerSelectData);
             }).catch(err => {
               alert('查询失败');
               console.log(err);
@@ -425,7 +430,7 @@
             console.log(this.editData.supplierId,this.editData.supplierName,this.editData.contactPerson,this.editData.phoneNumber,this.editData.createTime, this.editData.description);
             let createTime = this.editData.createTime.getFullYear() + '-' + (this.editData.createTime.getMonth()+1 < 10 ? '0'+(this.editData.createTime.getMonth()+1) : this.editData.createTime.getMonth()+1) + '-' +  (this.editData.createTime.getDate()<10?'0'+(this.editData.createTime.getDate()):this.editData.createTime.getDate());
             console.log(createTime);
-            retailerEdit(this.editData.supplierId,this.editData.supplierName,this.editData.contactPerson,this.editData.phoneNumber,this.editData.createTime, this.editData.description).then(res => {
+            retailerEdit(this.editData.supplierId,this.editData.supplierName,this.editData.contactPerson,this.editData.phoneNumber,createTime, this.editData.description).then(res => {
               console.log(res);
               if (res === 1) {
                 alert('修改成功');
@@ -451,10 +456,10 @@
       InsertRetailer(formName) {
         this.$refs[formName].validate(valid => {
           if (valid) {
-            console.log(this.addData.supplierId,this.addData.supplierName,this.addData.contactPerson,this.addData.phoneNumber,this.addData.createTime, this.addData.description);
-            let createTime = this.editData.createTime.getFullYear() + '-' + (this.editData.createTime.getMonth()+1 < 10 ? '0'+(this.editData.createTime.getMonth()+1) : this.editData.createTime.getMonth()+1) + '-' +  (this.editData.createTime.getDate()<10?'0'+(this.editData.createTime.getDate()):this.editData.createTime.getDate());
+            console.log(this.addData.supplierName,this.addData.contactPerson,this.addData.phoneNumber,this.addData.createTime, this.addData.description);
+            let createTime = this.addData.createTime.getFullYear() + '-' + (this.addData.createTime.getMonth()+1 < 10 ? '0'+(this.addData.createTime.getMonth()+1) : this.addData.createTime.getMonth()+1) + '-' +  (this.addData.createTime.getDate()<10?'0'+(this.addData.createTime.getDate()):this.addData.createTime.getDate());
             console.log(createTime);
-            retailerInsert(this.addData.supplierId,this.addData.supplierName,this.addData.contactPerson,this.addData.phoneNumber,this.addData.createTime, this.addData.description).then(res => {
+            retailerInsert(this.addData.supplierName,this.addData.contactPerson,this.addData.phoneNumber,createTime, this.addData.description).then(res => {
               console.log(res);
               if (res === 1) {
                 alert('添加成功');
@@ -494,6 +499,11 @@
     font-size: 14px;
   }
   #foot {
+    position: absolute;
+    top: 90%;
+    right: 10%;
+  }
+  #foot2 {
     position: absolute;
     top: 90%;
     right: 10%;

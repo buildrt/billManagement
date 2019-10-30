@@ -1,11 +1,11 @@
 import axios from '../axios'
 
-export function retailerSearch(supplierName) {
+export function retailerSearch(suppliername) {
   return axios({
-    url: '/retailer/select',
+    url: '/Supplier/selectOne',
     method: 'post',
-    data: {
-      supplierName,
+    params: {
+      suppliername,
     }
   })
 }

@@ -1,16 +1,16 @@
 import axios from '../axios'
 
-export function billInsert(billCode, commoditiesName, supplierName, price, pay, createTime, description) {
+export function billInsert(billcode, commoditiesname, suppliername, price, pay, createtime, description) {
   return axios({
-    url: '/bill/update',
+    url: '/Bill/insert',
     method: 'post',
     data: {
-      billCode,
-      commoditiesName,
-      supplierName,
+      billcode,
+      commoditiesname,
+      suppliername,
       price,
       pay,
-      createTime,
+      createtime,
       description
     }
   })

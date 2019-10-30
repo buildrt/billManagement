@@ -1,15 +1,15 @@
 import axios from '../axios'
 
-export function retailerEdit(supplierId, supplierName, contactPerson, phoneNumber, createTime, description) {
+export function retailerEdit(supplierid, suppliername, contactperson, phonenumber, createtime, description) {
   return axios({
-    url: '/retailer/update',
+    url: '/Supplier/update',
     method: 'post',
     data: {
-      supplierId,
-      supplierName,
-      contactPerson,
-      phoneNumber,
-      createTime,
+      supplierid,
+      suppliername,
+      contactperson,
+      phonenumber,
+      createtime,
       description
     }
   })

@@ -18,7 +18,7 @@
     </div>
     <el-table
       id="userInfo"
-      v-if="!this.$store.state.profileSelect"
+      v-if="!this.userPartIsShow"
       :data="UserData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
@@ -27,7 +27,7 @@
         fixed
         prop="clientId"
         width="160"
-        label="用户ID">
+        label="用户">
       </el-table-column>
       <el-table-column
         prop="clientName"
@@ -42,7 +42,7 @@
         label="真实姓名">
       </el-table-column>
       <el-table-column
-        prop="crId"
+        prop="rolename"
         width="140"
         fixed
         label="用户角色">
@@ -72,7 +72,7 @@
     </el-table>
     <el-table
       id="userSelectInfo"
-      v-else
+      v-if="this.userPartIsShow"
       :data="UserSelectData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
@@ -96,7 +96,7 @@
         label="真实姓名">
       </el-table-column>
       <el-table-column
-        prop="crId"
+        prop="rolename"
         width="140"
         fixed
         label="用户角色">
@@ -127,12 +127,24 @@
     <el-pagination
       @size-change="handleSizeChange"
       id="foot"
+      v-if="!this.userPartIsShow"
       @current-change="handleCurrentChange"
       :current-page="currpage"
       :page-sizes="[2, 4, 6, 8]"
       :page-size="pagesize"
       layout="total, sizes,prev, pager, next, jumper"
       :total="UserData.length">
+    </el-pagination>
+    <el-pagination
+      @size-change="handleSizeChange"
+      id="foot2"
+      v-if="this.userPartIsShow"
+      @current-change="handleCurrentChange"
+      :current-page="currpage"
+      :page-sizes="[2, 4, 6, 8]"
+      :page-size="pagesize"
+      layout="total, sizes,prev, pager, next, jumper"
+      :total="UserSelectData.length">
     </el-pagination>
     <el-drawer
       title="查看信息"
@@ -144,7 +156,7 @@
       <p>用户名：{{this.checkData.clientName}}</p>
       <p>真实姓名：{{this.checkData.name}}</p>
       <p>用户电话：{{this.checkData.phoneNumber}}</p>
-      <p>用户角色：{{this.checkData.crId}}</p>
+      <p>用户角色：{{this.checkData.rolename}}</p>
     </el-drawer>
     <el-drawer
       title="修改信息"
@@ -226,20 +238,22 @@
 <script>
   import {profileSearch} from "../../network/profile/search";
   import axios from "../../network/axios";
-  import {retailerEdit} from "../../network/retailer/edit";
   import {deleteUser} from "../../network/profile/delete";
   import {userInsert} from "../../network/profile/insert";
+  import {userEdit} from "../../network/profile/edit";
 
   export default {
     name: "Profile",
     mounted() {
-      this.$store.commit('setProfileSelect',false);
+      //this.$store.commit('setProfileSelect',false);
+      this.userPartIsShow = false;
       this.getFullUserData();
     },
     data() {
       return {
         UserData: [],
         UserSelectData: [],
+        userPartIsShow: true,
         pagesize: 8,  // 每页的数据数
         currpage: 1,  // 默认开始页面
         checkDrawer: false,
@@ -250,7 +264,7 @@
           clientName: '',
           phoneNumber: '',
           name: '',
-          crId: ''
+          rolename: ''
         },
         editData: {
           clientId: '',
@@ -321,21 +335,21 @@
     methods: {
       getFullUserData() {
         axios({
-          url: '/userInfo'
+          url: '/Client/selectAll'
         }).then(res => {
           console.log(res);
           console.log(res.length);
-          let UserData = res.data;
+          let UserData = res;
           let data = [];
           let len = UserData.length;
           for (let i=0; i< len; i++){
             let obj = {};
-            obj.clientId = UserData[i].clientId;
-            obj.clientName = UserData[i].clientName;
-            obj.passWord = UserData[i].passWord;
-            obj.phoneNumber = UserData[i].phoneNumber;
-            obj.name = UserData[i].name;
-            obj.crId = UserData[i].crId;
+            obj.clientId = UserData[i].clientid;
+            obj.clientName = UserData[i].clientname;
+            obj.passWord = UserData[i].password;
+            obj.phoneNumber = UserData[i].phonenumber;
+            obj.name = UserData[i].realname;
+            obj.rolename = UserData[i].rolename;
             data[i] = obj;
           }
           this.UserData = data;
@@ -354,7 +368,7 @@
         this.checkData.clientName = row.clientName;
         this.checkData.name = row.name;
         this.checkData.phoneNumber = row.phoneNumber;
-        this.checkData.crId = row.crId;
+        this.checkData.rolename = row.rolename;
       },
       UserDelete(index, row) {
         console.log(index, row);
@@ -377,23 +391,22 @@
             console.log(this.searchUserData.clientName);
             profileSearch(this.searchUserData.clientName).then(res => {
               console.log(res);
-              this.$store.commit('setProfileSelect',true);
-              alert('查询成功');
-              let UserSelectData = res.data;
-              let data = [];
-              let len = UserSelectData.length;
-              for (let i=0; i< len; i++){
-                let obj = {};
-                obj.clientId = UserSelectData[i].clientId;
-                obj.clientName = UserSelectData[i].clientName;
-                obj.passWord = UserSelectData[i].passWord;
-                obj.phoneNumber = UserSelectData[i].phoneNumber;
-                obj.name = UserSelectData[i].name;
-                obj.crId = UserSelectData[i].crId;
-                data[i] = obj;
-              }
-              this.UserSelectData = data;
+              //this.$store.commit('setProfileSelect',true);
+              this.userPartIsShow = true;
+              // alert('查询成功');
+              let UserSelectData = res;
+              let obj = {};
+              this.UserSelectData = [];
+              obj.clientId = UserSelectData.clientid;
+              obj.clientName = UserSelectData.clientname;
+              obj.passWord = UserSelectData.password;
+              obj.phoneNumber = UserSelectData.phonenumber;
+              obj.name = UserSelectData.realname;
+              obj.rolename = UserSelectData.rolename;
+              this.UserSelectData[0] = obj;
+              console.log(this.UserSelectData);
             }).catch(err => {
+              alert('查询失败');
               console.log(err);
             });
             // alert('查询成功');
@@ -411,7 +424,7 @@
       UserEditSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            retailerEdit(this.editData.clientId,this.editData.clientName,this.editData.name,this.editData.phoneNumber,this.editData.crId).then(res => {
+            userEdit(this.editData.clientId,this.editData.clientName,this.editData.name,this.editData.phoneNumber,this.editData.crId).then(res => {
               console.log(res);
               if (res === 1) {
                 alert('修改成功');
@@ -477,6 +490,11 @@
     font-size: 14px;
   }
   #foot {
+    position: absolute;
+    top: 90%;
+    right: 10%;
+  }
+  #foot2 {
     position: absolute;
     top: 90%;
     right: 10%;

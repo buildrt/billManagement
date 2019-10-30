@@ -1,11 +1,11 @@
 import axios from '../axios'
 
-export function deleteBill(billCode) {
+export function deleteBill(billid) {
   return axios({
-    url: '/bill/select',
+    url: '/Bill/delete',
     method: 'post',
-    data: {
-      billCode,
+    params: {
+      billid,
     }
   })
 }

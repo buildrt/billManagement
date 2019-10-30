@@ -59,8 +59,12 @@ const routes = [
 
 // 监听浏览器刷新
 if (window.localStorage.getItem('isLogin') === 'true') {
-  console.log(Boolean(window.localStorage.getItem('isLogin')));
+  console.log('isLogin:'+Boolean(window.localStorage.getItem('isLogin')));
+  console.log('loginUserName:'+window.localStorage.getItem('loginUserName'));
+  console.log('loginPassWord:'+window.localStorage.getItem('loginPassWord'));
   store.commit('setIsLogin',Boolean(window.localStorage.getItem('isLogin')));
+  store.commit('setLoginUserName',window.localStorage.getItem('loginUserName'));
+  store.commit('setLoginPassWord',window.localStorage.getItem('loginPassWord'));
 }
 if (window.localStorage.getItem('isAdmin') === 'true') {
   console.log(Boolean(window.localStorage.getItem('isAdmin')));

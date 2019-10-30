@@ -1,11 +1,11 @@
 import axios from '../axios'
 
-export function deleteRetailer(supplierId) {
+export function deleteRetailer(supplierid) {
   return axios({
-    url: '/retailer/delete',
+    url: '/Supplier/delete',
     method: 'post',
-    data: {
-      supplierId,
+    params: {
+      supplierid,
     }
   })
 }

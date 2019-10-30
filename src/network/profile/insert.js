@@ -1,16 +1,16 @@
 import axios from '../axios'
 
-export function userInsert(clientId, clientName, name,phoneNumber, crId, passWord) {
+export function userInsert(clientid, clientname, realname,phonenumber, rolename, password) {
   return axios({
-    url: '/profile/insert',
+    url: '/Client/insert',
     method: 'post',
     data: {
-      clientId,
-      clientName,
-      name,
-      phoneNumber,
-      crId,
-      passWord
+      clientid,
+      clientname,
+      realname,
+      phonenumber,
+      rolename,
+      password
     }
   })
 }

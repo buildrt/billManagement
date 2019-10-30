@@ -7,8 +7,8 @@
         :rules="searchBillRules"
         ref="searchBillData"
         id="billSearch">
-        <el-form-item class="billelfrom" label="商品名称" prop="billCode">
-          <el-input id="name" type="text" v-model="searchBillData.billCode"></el-input>
+        <el-form-item class="billelfrom" label="商品名称" prop="commoditiesName">
+          <el-input id="name" type="text" v-model="searchBillData.commoditiesName"></el-input>
         </el-form-item>
         <el-form-item class="billelfrom" label="供应商" prop="supplierName">
           <el-select v-model="searchBillData.supplierName" clearable placeholder="请选择">
@@ -38,7 +38,7 @@
     </div>
     <el-table
       id="billInfo"
-      v-if="!this.$store.state.billSelect"
+      v-if="!this.billPartIsShow"
       :data="BillData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
@@ -96,7 +96,7 @@
     </el-table>
     <el-table
       id="billSelectInfo"
-      v-else
+      v-if="this.billPartIsShow"
       :data="BillSelectData.slice((currpage-1)*pagesize,currpage*pagesize)"
       height="64%"
       style="width: 96%"
@@ -155,12 +155,24 @@
     <el-pagination
       @size-change="handleSizeChange"
       id="foot"
+      v-if="!this.billPartIsShow"
       @current-change="handleCurrentChange"
       :current-page="currpage"
       :page-sizes="[2, 4, 6, 8]"
       :page-size="pagesize"
       layout="total, sizes,prev, pager, next, jumper"
       :total="BillData.length">
+    </el-pagination>
+    <el-pagination
+      @size-change="handleSizeChange"
+      id="foot2"
+      v-if="this.billPartIsShow"
+      @current-change="handleCurrentChange"
+      :current-page="currpage"
+      :page-sizes="[2, 4, 6, 8]"
+      :page-size="pagesize"
+      layout="total, sizes,prev, pager, next, jumper"
+      :total="BillSelectData.length">
     </el-pagination>
     <el-drawer
       title="查看信息"
@@ -291,13 +303,15 @@
   export default {
     name: "Bill",
     mounted() {
-      this.$store.commit('setBillSelect',false);
+      // this.$store.commit('setBillSelect',false);
+      this.billPartIsShow = false;
       this.getFullData();
     },
     data() {
       return {
         BillData: [],
         BillSelectData: [],
+        billPartIsShow: true,
         payData: [
           {value: 0, label: '未付款'},
           {value: 1, label: '已付款'}
@@ -327,6 +341,7 @@
           createTime: '',
           description: ''
         },
+        editId: '',
         editRules: {
           billCode: [
             { required: true, message: '请输入账单编码', trigger: 'blur' },
@@ -351,13 +366,13 @@
           ]
         },
         searchBillData: {
-          billCode: '',
+          commoditiesName: '',
           supplierName: '',
           pay: '',
         },
         searchBillRules: {
-          billCode: [
-            { required: true, message: '请输入账单编码', trigger: 'blur' },
+          commoditiesName: [
+            { required: true, message: '请输入商品名称', trigger: 'blur' },
           ],
           supplierName: [
             { required: true, message: '请输入供应商', trigger: 'blur' },
@@ -403,25 +418,26 @@
     methods: {
       getFullData() {
         axios({
-          url: '/billInfo'
+          url: '/Bill/selectAll'
         }).then(res => {
           console.log(res);
-          let BillData = res.data;
+          let BillData = res;
           let data = [];
           let len = BillData.length;
           console.log(len);
           for (let i=0; i< len; i++){
             let obj = {};
-            obj.billCode = BillData[i].billCode;
-            obj.commoditiesName = BillData[i].commoditiesName;
-            obj.supplierName = BillData[i].supplierName;
+            obj.billId = BillData[i].billid;
+            obj.billCode = BillData[i].billcode;
+            obj.commoditiesName = BillData[i].commoditiesname;
+            obj.supplierName = BillData[i].suppliername;
             obj.price = BillData[i].price;
             if (BillData[i].pay === 1) {
               obj.pay = '已付款'
             }else {
               obj.pay = '未付款'
             }
-            obj.createTime = BillData[i].createTime;
+            obj.createTime = BillData[i].createtime;
             obj.description = BillData[i].description;
             data[i] = obj;
           }
@@ -432,6 +448,7 @@
       },
       BillEdit(index, row) {
         console.log(index, row);
+        this.editId = row.billId;
         this.editDrawer = true;
       },
       BillCheck(index, row) {
@@ -448,7 +465,7 @@
       },
       BillDelete(index, row) {
         console.log(index, row);
-        deleteBill(row.billCode).then(res => {
+        deleteBill(row.billId).then(res => {
           console.log(res);
           if (res === 1) {
             alert('删除成功');
@@ -464,31 +481,29 @@
       SearchBill(formName) {
         this.$refs[formName].validate(valid => {
           if (valid) {
-            console.log(this.searchBillData.billCode, this.searchBillData.supplierName, this.searchBillData.pay);
-            billSearch(this.searchBillData.billCode, this.searchBillData.supplierName, this.searchBillData.pay).then(res => {
+            console.log(this.searchBillData.commoditiesName, this.searchBillData.supplierName, this.searchBillData.pay);
+            billSearch(this.searchBillData.commoditiesName, this.searchBillData.supplierName, this.searchBillData.pay).then(res => {
               console.log(res);
-              alert('查询成功');
-              this.$store.commit('setBillSelect',true);
-              let BillSelectData = res.data;
-              let data = [];
-              let len = BillSelectData.length;
-              console.log(len);
-              for (let i=0; i< len; i++){
-                let obj = {};
-                obj.billCode = BillSelectData[i].billCode;
-                obj.commoditiesName = BillSelectData[i].commoditiesName;
-                obj.supplierName = BillSelectData[i].supplierName;
-                obj.price = BillSelectData[i].price;
-                if (BillSelectData[i].pay === 1) {
-                  obj.pay = '已付款'
-                }else {
-                  obj.pay = '未付款'
-                }
-                obj.createTime = BillSelectData[i].createTime;
-                obj.description = BillSelectData[i].description;
-                data[i] = obj;
+              // alert('查询成功');
+              //this.$store.commit('setBillSelect',true);
+              this.billPartIsShow = true;
+              let BillSelectData = res;
+              let obj = {};
+              this.BillSelectData = [];
+              obj.billId = BillSelectData.billid;
+              obj.billCode = BillSelectData.billcode;
+              obj.commoditiesName = BillSelectData.commoditiesname;
+              obj.supplierName = BillSelectData.suppliername;
+              obj.price = BillSelectData.price;
+              if (BillSelectData.pay === 1) {
+                obj.pay = '已付款'
+              }else {
+                obj.pay = '未付款'
               }
-              this.BillSelectData = data;
+              obj.createTime = BillSelectData.createtime;
+              obj.description = BillSelectData.description;
+              this.BillSelectData[0] = obj;
+              console.log(this.BillSelectData);
             }).catch(err => {
               alert('查询失败');
               console.log(err);
@@ -508,10 +523,10 @@
       BillEditSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log(this.editData.billCode,this.editData.commoditiesName,this.editData.supplierName,this.editData.price,this.editData.pay,this.editData.createTime, this.editData.description);
+            console.log(this.editId,this.editData.billCode,this.editData.commoditiesName,this.editData.supplierName,this.editData.price,this.editData.pay,this.editData.createTime, this.editData.description);
             let createTime = this.editData.createTime.getFullYear() + '-' + (this.editData.createTime.getMonth()+1 < 10 ? '0'+(this.editData.createTime.getMonth()+1) : this.editData.createTime.getMonth()+1) + '-' +  (this.editData.createTime.getDate()<10?'0'+(this.editData.createTime.getDate()):this.editData.createTime.getDate());
             console.log(createTime);
-            billEdit(this.editData.billCode,this.editData.commoditiesName,this.editData.supplierName,this.editData.price,this.editData.pay,createTime, this.editData.description).then(res => {
+            billEdit(this.editId,this.editData.billCode,this.editData.commoditiesName,this.editData.supplierName,this.editData.price,this.editData.pay,createTime, this.editData.description).then(res => {
               console.log(res);
               if (res === 1) {
                 alert('修改成功');
@@ -538,7 +553,7 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             console.log(this.addData.billCode,this.addData.commoditiesName,this.addData.supplierName,this.addData.price,this.addData.pay,this.addData.createTime, this.addData.description);
-            let createTime = this.editData.createTime.getFullYear() + '-' + (this.editData.createTime.getMonth()+1 < 10 ? '0'+(this.editData.createTime.getMonth()+1) : this.editData.createTime.getMonth()+1) + '-' +  (this.editData.createTime.getDate()<10?'0'+(this.editData.createTime.getDate()):this.editData.createTime.getDate());
+            let createTime = this.addData.createTime.getFullYear() + '-' + (this.addData.createTime.getMonth()+1 < 10 ? '0'+(this.addData.createTime.getMonth()+1) : this.addData.createTime.getMonth()+1) + '-' +  (this.addData.createTime.getDate()<10?'0'+(this.addData.createTime.getDate()):this.addData.createTime.getDate());
             console.log(createTime);
             billInsert(this.addData.billCode,this.addData.commoditiesName,this.addData.supplierName,this.addData.price,this.addData.pay,createTime, this.addData.description).then(res => {
               console.log(res);
@@ -550,6 +565,7 @@
                 alert('添加失败');
               }
             }).catch(err => {
+              alert('添加失败');
               console.log(err);
             })
           }
@@ -580,6 +596,11 @@
     font-size: 14px;
   }
   #foot {
+    position: absolute;
+    top: 90%;
+    right: 10%;
+  }
+  #foot2 {
     position: absolute;
     top: 90%;
     right: 10%;

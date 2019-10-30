@@ -34,33 +34,41 @@
         if (username === '' || password === '') {
           alert("请输入用户名及密码");
         } else {
-          // console.log(username, password, this.rememberIsClick);
-          // login(username,password,this.rememberIsClick).then(res => {
-          //   console.log(res);
-          //   if (res === 1) {
-          //     alert("登录成功");
-          //     this.$store.commit('setIsLogin',true);
-          //     // 改变localStorage中isLogin值
-          //     window.localStorage.setItem('isLogin', 'true');
-          //     if (res.rroleId === 1){
-          //       this.$store.commit('setIsAdmin',true);
-          //     } else {
-          //       this.$store.commit('setIsAdmin',false);
-          //     }
-          //     this.$router.replace('/bill');
-          //   } else {
-          //     alert("登录失败");
-          //   }
-          // }).catch(err => {
-          //   console.log(err);
-          // })
-          alert("登录成功");
-          this.$store.commit('setIsLogin',true);
-          // 改变localStorage中isLogin值
-          window.localStorage.setItem('isLogin', 'true');
-          this.$store.commit('setIsAdmin', true);
-          window.localStorage.setItem('isAdmin', 'true');
-          this.$router.replace('/bill');
+          console.log(username, password, this.rememberIsClick);
+          login(username,password,this.rememberIsClick).then(res => {
+            console.log(res);
+            if (res.code === 200) {
+              this.$store.commit('setLoginUserName', username);
+              this.$store.commit('setLoginPassWord', password);
+              window.localStorage.setItem('loginPassWord', password);
+              window.localStorage.setItem('loginUserName', username);
+              this.$store.commit('setIsLogin',true);
+              // 改变localStorage中isLogin值
+              window.localStorage.setItem('isLogin', 'true');
+              if (res.rroleId === 1){
+                this.$store.commit('setIsAdmin',true);
+              } else {
+                this.$store.commit('setIsAdmin',false);
+              }
+              this.$router.replace('/bill');
+            } else {
+              alert("登录失败");
+            }
+          }).catch(err => {
+            alert("登录失败");
+            console.log(err);
+          })
+          // alert("登录成功");
+          // this.$store.commit('setLoginUserName', username);
+          // this.$store.commit('setLoginPassWord', password);
+          // window.localStorage.setItem('loginPassWord', password);
+          // window.localStorage.setItem('loginUserName', username);
+          // this.$store.commit('setIsLogin',true);
+          // // 改变localStorage中isLogin值
+          // window.localStorage.setItem('isLogin', 'true');
+          // this.$store.commit('setIsAdmin', true);
+          // window.localStorage.setItem('isAdmin', 'true');
+          // this.$router.replace('/bill');
         }
       },
       IsRemember() {

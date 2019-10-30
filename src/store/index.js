@@ -13,6 +13,8 @@ const state = {
   billSelect: false,
   retailerSelect: false,
   profileSelect: false,
+  loginPassWord: '',
+  loginUserName: '',
 };
 
 const store = new Vuex.Store({

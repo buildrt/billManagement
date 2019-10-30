@@ -1,16 +1,17 @@
 import axios from '../axios'
 
-export function billEdit(billCode, commoditiesName, supplierName, price, pay, createTime, description) {
+export function billEdit(billid,billcode, commoditiesname, suppliername, price, pay, createtime, description) {
   return axios({
-    url: '/bill/update',
+    url: '/Bill/update',
     method: 'post',
     data: {
-      billCode,
-      commoditiesName,
-      supplierName,
+      billid,
+      billcode,
+      commoditiesname,
+      suppliername,
       price,
       pay,
-      createTime,
+      createtime,
       description
     }
   })

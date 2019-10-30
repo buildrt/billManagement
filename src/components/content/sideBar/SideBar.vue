@@ -36,6 +36,7 @@
         // localStorage里只能存储String
         window.localStorage.setItem('isLogin', 'false');
         setTimeout(() => {
+          this.$router.push('/logout');
           this.$router.replace('/login');
         },500);
       }

@@ -1,12 +1,12 @@
 import axios from '../axios'
 
-export function billSearch(billCode, supplierName, pay) {
+export function billSearch(commoditiesname, suppliername, pay) {
   return axios({
-    url: '/bill/select',
+    url: '/Bill/selectOne',
     method: 'post',
-    data: {
-      billCode,
-      supplierName,
+    params: {
+      commoditiesname,
+      suppliername,
       pay,
     }
   })

@@ -2,9 +2,9 @@ import axios from '../axios'
 
 export function profileSearch(clientName) {
   return axios({
-    url: '/profile/select',
+    url: '/Client/selectOne',
     method: 'post',
-    data: {
+    params: {
       clientName,
     }
   })

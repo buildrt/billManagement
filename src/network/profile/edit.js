@@ -2,7 +2,7 @@ import axios from '../axios'
 
 export function userEdit(clientId, clientName, name,phoneNumber, crId) {
   return axios({
-    url: '/profile/update',
+    url: '/Client/update',
     method: 'post',
     data: {
       clientId,

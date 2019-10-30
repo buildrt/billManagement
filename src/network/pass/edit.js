@@ -1,12 +1,12 @@
 import axios from '../axios'
 
-export function passEdit(oldPass, newPass) {
+export function passEdit(clientName, password) {
   return axios({
-    url: '/profile/update',
+    url: '/client/passWord',
     method: 'post',
-    data: {
-      oldPass,
-      newPass
+    params: {
+      clientName,
+      password
     }
   })
 }
