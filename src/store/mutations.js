@@ -19,5 +19,8 @@ export default {
   },
   setLoginPassWord(state, loginPassWord) {
     state.loginPassWord = loginPassWord;
+  },
+  setLoginUserID(state, loginUserID) {
+    state.loginUserID = loginUserID;
   }
 }

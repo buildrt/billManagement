@@ -76,8 +76,8 @@
       EditPass(formName) {
         this.$refs[formName].validate(valid => {
           if (valid) {
-            console.log(this.$store.getters.getLoginUserName);
-            passEdit(this.$store.getters.getLoginUserName, this.EditData.newPass).then(res => {
+            console.log(this.$store.getters.getLoginUserID);
+            passEdit(this.$store.getters.getLoginUserID, this.EditData.newPass).then(res => {
               console.log(res);
               if (res === 1) {
                 alert('更改成功');

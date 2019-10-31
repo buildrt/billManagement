@@ -40,12 +40,14 @@
             if (res.code === 200) {
               this.$store.commit('setLoginUserName', username);
               this.$store.commit('setLoginPassWord', password);
+              this.$store.commit('setLoginUserID', res.clientid);
               window.localStorage.setItem('loginPassWord', password);
               window.localStorage.setItem('loginUserName', username);
+              window.localStorage.setItem('loginUserID', res.clientid);
               this.$store.commit('setIsLogin',true);
               // 改变localStorage中isLogin值
               window.localStorage.setItem('isLogin', 'true');
-              if (res.rroleId === 1){
+              if (res.rolename === 'admin'){
                 this.$store.commit('setIsAdmin',true);
               } else {
                 this.$store.commit('setIsAdmin',false);
@@ -98,7 +100,7 @@
     margin: 0;
     padding: 0;
     font-family: sans-serif;
-    background: no-repeat rgba(0,0,0,0.8);
+    background-color: #413f3f;
     background-size: cover;
   }
   .login-box {

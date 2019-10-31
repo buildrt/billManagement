@@ -15,6 +15,7 @@ const state = {
   profileSelect: false,
   loginPassWord: '',
   loginUserName: '',
+  loginUserID: '',
 };
 
 const store = new Vuex.Store({

@@ -4,5 +4,8 @@ export default {
   },
   getLoginUserName(state) {
     return state.loginUserName;
+  },
+  getLoginUserID(state) {
+    return state.loginUserID;
   }
 }

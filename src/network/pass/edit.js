@@ -1,11 +1,11 @@
 import axios from '../axios'
 
-export function passEdit(clientName, password) {
+export function passEdit(clientid, password) {
   return axios({
     url: '/client/passWord',
     method: 'post',
     params: {
-      clientName,
+      clientid,
       password
     }
   })

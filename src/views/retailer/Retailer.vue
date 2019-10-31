@@ -480,7 +480,7 @@
 
 <style>
   .retailerelfrom .el-form-item__label {
-    color: white;
+    color: #6d6666;
   }
 </style>
 
@@ -512,7 +512,7 @@
     position: absolute;
     width: 100%;
     height: 18%;
-    background-color: #ff8198;
+    /*background-color: #ff8198;*/
   }
   #retailerSearch {
     position: relative;

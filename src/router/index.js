@@ -65,6 +65,7 @@ if (window.localStorage.getItem('isLogin') === 'true') {
   store.commit('setIsLogin',Boolean(window.localStorage.getItem('isLogin')));
   store.commit('setLoginUserName',window.localStorage.getItem('loginUserName'));
   store.commit('setLoginPassWord',window.localStorage.getItem('loginPassWord'));
+  store.commit('setLoginUserID', window.localStorage.getItem('loginUserID'));
 }
 if (window.localStorage.getItem('isAdmin') === 'true') {
   console.log(Boolean(window.localStorage.getItem('isAdmin')));

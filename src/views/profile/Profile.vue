@@ -205,9 +205,6 @@
         id="addForm"
         style="width: 96%"
         label-position="right">
-        <el-form-item label="用户ID" label-width="100px" prop="clientId">
-          <el-input type="text" v-model="addData.clientId"></el-input>
-        </el-form-item>
         <el-form-item label="用户名" label-width="100px" prop="clientName">
           <el-input type="text" v-model="addData.clientName"></el-input>
         </el-form-item>
@@ -275,7 +272,7 @@
         },
         editRules: {
           clientId: [
-            { required: true, message: '请输入用户ID', trigger: 'blur' },
+            {required: true, message: '请输入用户ID', trigger: 'blur'}
           ],
           clientName: [
             { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -299,7 +296,6 @@
           ]
         },
         addData: {
-          clientId: '',
           clientName: '',
           phoneNumber: '',
           name: '',
@@ -308,9 +304,6 @@
           checkPass: ''
         },
         addRules: {
-          clientId: [
-            { required: true, message: '请输入用户ID', trigger: 'blur' },
-          ],
           clientName: [
             { required: true, message: '请输入用户名', trigger: 'blur' },
           ],
@@ -450,7 +443,7 @@
       InsertUser(formName) {
         this.$refs[formName].validate(valid => {
           if (valid) {
-            userInsert(this.addData.clientId,this.addData.clientName,this.addData.name,this.addData.phoneNumber,this.addData.crId, this.addData.passWord).then(res => {
+            userInsert(null,this.addData.clientName,this.addData.name,this.addData.phoneNumber,this.addData.crId, this.addData.passWord).then(res => {
               console.log(res);
               if (res === 1) {
                 alert('添加成功');
@@ -471,7 +464,7 @@
 
 <style>
   .profileElfrom .el-form-item__label {
-    color: white;
+    color: #6d6666;
   }
 </style>
 
@@ -503,7 +496,7 @@
     position: absolute;
     width: 100%;
     height: 18%;
-    background-color: #ff8198;
+    /*background-color: #ff8198;*/
   }
   #profileSearch {
     position: relative;

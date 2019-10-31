@@ -7,7 +7,7 @@
       </div>
     </div>
     <div id="foot">
-      <p>本页面由Buildrt版权所有</p>
+      <p></p>
     </div>
   </div>
 </template>
@@ -60,7 +60,7 @@
     left: 0;
     width: 100%;
     height: 12%;
-    background-image: linear-gradient(to bottom right,#e56ce7, #91b4e5);
+    background-image: linear-gradient(to bottom right,#12b8f0, #93b3e0);
     box-shadow: 0 5px 5px rgba(100,100,100,.5);
   }
   #head #title {
@@ -80,7 +80,7 @@
     width: 100%;
     height: 8%;
     text-align: center;
-    background-image: linear-gradient(to bottom right, #91b4e5,#e56ce7);
+    background-image: linear-gradient(to bottom right, #93b3e0,#12b8f0);
   }
   #foot p {
     position: relative;
