@@ -1,15 +1,14 @@
 import axios from '../axios'
 
-export function userEdit(clientId, clientName, name,phoneNumber, crId) {
+export function userEdit(clientid, clientname, realname,phonenumber, rolename) {
   return axios({
-    url: '/Client/update',
+    url: '/Client/update?rolename='+rolename,
     method: 'post',
     data: {
-      clientId,
-      clientName,
-      name,
-      phoneNumber,
-      crId
+      clientid,
+      clientname,
+      realname,
+      phonenumber,
     }
   })
 }

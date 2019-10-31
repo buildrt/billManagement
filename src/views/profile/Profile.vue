@@ -171,9 +171,6 @@
         id="editForm"
         style="width: 96%"
         label-position="right">
-        <el-form-item label="用户ID" label-width="100px" prop="clientId">
-          <el-input type="text" v-model="editData.clientId"></el-input>
-        </el-form-item>
         <el-form-item label="用户名" label-width="100px" prop="clientName">
           <el-input type="text" v-model="editData.clientName"></el-input>
         </el-form-item>
@@ -264,16 +261,12 @@
           rolename: ''
         },
         editData: {
-          clientId: '',
           clientName: '',
           phoneNumber: '',
           name: '',
           crId: ''
         },
         editRules: {
-          clientId: [
-            {required: true, message: '请输入用户ID', trigger: 'blur'}
-          ],
           clientName: [
             { required: true, message: '请输入用户名', trigger: 'blur' },
           ],
@@ -287,6 +280,7 @@
             { required: true, message: '请输入用户角色', trigger: 'blur' },
           ]
         },
+        editClientId: '',
         searchUserData: {
           clientName: '',
         },
@@ -352,6 +346,7 @@
       },
       UserEdit(index, row) {
         console.log(index, row);
+        this.editClientId = row.clientId;
         this.editDrawer = true;
       },
       UserCheck(index, row) {
@@ -417,7 +412,7 @@
       UserEditSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            userEdit(this.editData.clientId,this.editData.clientName,this.editData.name,this.editData.phoneNumber,this.editData.crId).then(res => {
+            userEdit(this.editClientId,this.editData.clientName,this.editData.name,this.editData.phoneNumber,this.editData.crId).then(res => {
               console.log(res);
               if (res === 1) {
                 alert('修改成功');

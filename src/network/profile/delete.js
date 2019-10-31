@@ -4,7 +4,7 @@ export function deleteUser(clientId) {
   return axios({
     url: '/Client/delete',
     method: 'post',
-    data: {
+    params: {
       clientId,
     }
   })
