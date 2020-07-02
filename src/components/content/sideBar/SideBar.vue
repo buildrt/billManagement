@@ -51,13 +51,18 @@
     width: 13%;
     height: 80%;
     /*background-color: rgba(0,0,0,0);*/
-    box-shadow: 8px 0 5px rgba(100,100,100,.5);
+    background-image: url("../../../assets/img/login/navbar3.png");
+    box-shadow: 4px 0 1px rgba(100,100,100,.5);
     text-align: left;
-    background-color: #e6eaed;
+    /*background-color: #e6eaed;*/
   }
   .el-menu-item i {
     margin-right: 15px;
     margin-left: 10px;
     font-size: 20px;
+    font-weight: bolder;
+  }
+  .el-menu-item span {
+    font-weight: bolder;
   }
 </style>

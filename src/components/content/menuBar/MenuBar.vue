@@ -5,6 +5,10 @@
       <div id="clock">
         <p class="date">{{ date }}&nbsp;{{ time }}</p>
       </div>
+
+      <div id="wel">
+        <p>欢迎你：{{$store.state.loginUserName}}</p>
+      </div>
     </div>
     <div id="foot">
       <p></p>
@@ -60,18 +64,19 @@
     left: 0;
     width: 100%;
     height: 12%;
-    background-image: linear-gradient(to bottom right,#12b8f0, #93b3e0);
+    /*background-image: linear-gradient(to bottom right,#12b8f0, #93b3e0);*/
+    background-image: url("../../../assets/img/login/headImg1.png");
     box-shadow: 0 5px 5px rgba(100,100,100,.5);
   }
   #head #title {
     position: relative;
-    margin-left: 10px;
-    font-size: 24px;
-    color: white;
+    margin-left: 50px;
+    font-size: 36px;
+    color: #434141;
     margin-top: 10px;
-    font-family: sans-serif;
+    font-family: 华文行楷;
     font-weight: bold;
-    text-shadow: 2px 1px #000;
+    text-shadow: 2px 1px #696969;
   }
   #foot {
     position: absolute;
@@ -80,7 +85,8 @@
     width: 100%;
     height: 8%;
     text-align: center;
-    background-image: linear-gradient(to bottom right, #93b3e0,#12b8f0);
+    /*background-image: linear-gradient(to bottom right, #93b3e0,#12b8f0);*/
+    background-image: url("../../../assets/img/login/headImg1.png");
   }
   #foot p {
     position: relative;
@@ -90,18 +96,36 @@
   }
   #clock {
     position: absolute;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 华文新魏;
     /*color: #ffffff;*/
     text-align: left;
-    left: 11%;
+    left: 20%;
     top: 80%;
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-    color: #daf6ff;
-    text-shadow: 0 0 20px #0aafe6, 0 0 20px rgba(10, 175, 230, 0);
+    color: #409eff;
+    font-weight: bold;
+    /*text-shadow: 0 0 20px #0aafe6, 0 0 20px rgba(10, 175, 230, 0);*/
   }
   #clock .date {
     letter-spacing: 0.1em;
-    font-size: 18px;
+    font-size: 22px;
+  }
+  #wel {
+    position: absolute;
+    /*color: #ffffff;*/
+    text-align: left;
+    right: 9%;
+    top: 80%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    color: #409eff;
+    font-family: 华文新魏;
+    font-weight: bold;
+    /*text-shadow: 0 0 20px #0aafe6, 0 0 20px rgba(10, 175, 230, 0);*/
+  }
+  #wel p {
+    letter-spacing: 0.1em;
+    font-size: 22px;
   }
 </style>
